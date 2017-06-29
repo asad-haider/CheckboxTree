@@ -1,0 +1,71 @@
+list = [
+    name: 'Developer'
+    opened: true
+    children: [
+        name: 'Front-End'
+        children: [
+            name: 'Jack'
+            title: 'Leader'
+          ,
+            name: 'John'
+            title: 'Senior F2E'
+          ,
+            name: 'Jason'
+            title: 'Junior F2E'
+        ]
+      ,
+        name: 'Back-End'
+        children: [
+            name: 'Mary',
+            title: 'Leader'
+          ,
+            name: 'Gary'
+            title: 'Intern'
+        ]
+    ]
+  ,
+    name: 'Design'
+    children: [
+      name: 'Freeman'
+      title: 'Designer'
+    ]
+  ,
+    name: 'S&S'
+    children: [
+        name: 'Nikky'
+        title: 'Robot'
+    ]
+]
+
+app = angular.module('testApp', []).controller('treeTable', [ '$scope', '$filter', ($scope, $filter) ->
+  $scope.list = list  
+  
+  $scope.toggleAllCheckboxes = ($event) ->
+    selected = $event.target.checked
+    for item in $scope.list
+      item.selected = selected
+      $scope.$broadcast('changeChildren', item) if item.children?
+
+  $scope.initCheckbox = (item, parentItem) ->
+    item.selected = parentItem && parentItem.selected || item.selected || false
+  
+  $scope.toggleCheckbox = (item, parentScope) ->
+    $scope.$broadcast('changeChildren', item) if item.children?
+    $scope.$emit('changeParent', parentScope) if parentScope.item?
+
+  $scope.$on 'changeChildren', (event, parentItem) ->
+    for child in parentItem.children
+      child.selected = parentItem.selected
+      $scope.$broadcast('changeChildren', child) if child.children?
+
+  $scope.$on 'changeParent', (event, parentScope) ->
+    children = parentScope.item.children
+    parentScope.item.selected = $filter('selected')(children).length == children.length
+    parentScope = parentScope.$parent.$parent
+    $scope.$broadcast('changeParent', parentScope) if parentScope.item?
+])
+
+app.filter 'selected', ['$filter', ($filter) ->
+  (files) ->
+    $filter('filter')(files, {selected: true})
+]

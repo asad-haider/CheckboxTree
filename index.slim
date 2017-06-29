@@ -1,0 +1,30 @@
+h1 Tree Table and Checkbox with AngularJS
+.wrapper ng-app="testApp" ng-controller="treeTable"
+  table.table-nested
+    thead
+      tr
+        th.cell-input
+          input type="checkbox" ng-checked="(list | selected).length == list.length" ng-click="toggleAllCheckboxes($event)"
+        th
+          | Name
+        th.cell-members
+          | Members
+        th
+          | Title
+    tbody ng-class='{opened: item.opened}' ng-repeat='item in list' ng-include="'table_tree.html'"
+  script type="text/ng-template" id="table_tree.html"
+    tr ng-class="{parent: item.children}" ng-init="parentScope = $parent.$parent; initCheckbox(item, parentScope.item)"
+      td.cell-input
+        input type="checkbox" ng-model="item.selected" ng-change="toggleCheckbox(item, parentScope)"
+      td.cell-name ng-click="item.opened = !item.opened"
+        .indent style="padding-left: {{15*level}}px"
+        | {{item.name}}
+      td.cell-members
+        | {{item.children.length}}
+      td
+        | {{item.title}}
+    tr.children ng-if="item.children && item.children.length > 0"
+      td colspan="4"
+        table
+          tbody ng-class='{opened: item.opened}' ng-repeat='item in item.children' ng-include="'table_tree.html'" ng-init="level = level + 1"
+        

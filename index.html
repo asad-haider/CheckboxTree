@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>Tree Table and Checkbox with AngularJS</title>
+  
+  
+  <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css'>
+
+      <link rel="stylesheet" href="css/style.css">
+
+  
+</head>
+
+<body>
+  <h1>
+  Tree Table and Checkbox with AngularJS
+</h1>
+<div class="wrapper" ng-app="testApp" ng-controller="treeTable">
+  <table class="table-nested">
+    <thead>
+      <tr>
+        <th class="cell-input">
+          <input ng-checked="(list | selected).length == list.length" ng-click="toggleAllCheckboxes($event)" type="checkbox"
+                 indeterminate="((list | selected).length != list.length) && ((list | selected).length != 0)"
+          />
+        </th>
+        <th>
+          Name
+        </th>
+        <th class="cell-members">
+          Members
+        </th>
+        <th>
+          Title
+        </th>
+      </tr>
+    </thead>
+    <tbody ng-class="{opened: item.opened}" ng-include="&#39;table_tree.html&#39;" ng-repeat="item in list"></tbody>
+  </table>
+  <script id="table_tree.html" type="text/ng-template">
+    <tr ng-class="{parent: item.children}" ng-init="parentScope = $parent.$parent; initCheckbox(item, parentScope.item)">
+      <td class="cell-input">
+        <input ng-change="toggleCheckbox(item, parentScope)" ng-model="item.selected" type="checkbox"
+               indeterminate="item.isIndeterminate"
+        />
+      </td>
+      <td class="cell-name" ng-click="item.opened = !item.opened">
+        <div class="indent" style="padding-left: {{15*level}}px"></div>
+        {{item.name}}
+      </td>
+      <td class="cell-members">
+        {{item.children.length}}
+      </td>
+      <td>
+        {{item.title}}
+        <label ng-repeat="accessType in accessTypes">
+          <input type="radio" name="{{item.name}}" ng-model="item.accessTypeId"
+                 ng-change="toggleCheckbox(item, parentScope)"
+                 ng-value="accessType.accessTypeId" />
+          {{accessType.title}}
+        </label>
+      </td>
+    </tr>
+    <tr class="children" ng-if="item.children &amp;&amp; item.children.length &gt; 0">
+      <td colspan="4">
+        <table>
+          <tbody ng-class="{opened: item.opened}" ng-include="&#39;table_tree.html&#39;" ng-init="level = level + 1" ng-repeat="item in item.children"></tbody>
+        </table>
+      </td>
+    </tr>
+  </script>
+</div>
+  <script src='http://ajax.googleapis.com/ajax/libs/angularjs/1.3.2/angular.min.js'></script>
+
+    <script src="js/index.js"></script>
+
+</body>
+</html>
